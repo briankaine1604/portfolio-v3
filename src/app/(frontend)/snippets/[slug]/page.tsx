@@ -1,13 +1,15 @@
 "use client";
-import { ArrowLeft, Copy, Check, Calendar, Tag } from "lucide-react";
+import { ArrowLeft, Copy, Check } from "lucide-react";
 import { use, useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/client";
+import { format } from "date-fns";
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
+
 export default function SnippetDetailPage({ params }: Props) {
   const { slug } = use(params);
   const [copied, setCopied] = useState(false);
@@ -21,32 +23,34 @@ export default function SnippetDetailPage({ params }: Props) {
 
   if (isLoading || isFetching) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-600 text-lg">Loading snippet...</p>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <p className="text-slate-600">Loading snippet...</p>
       </div>
     );
   }
 
   if (!snippet || isError) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center">
-        <p className="text-gray-600 text-lg">Snippet not found.</p>
-        <Link href="/snippets" className="text-blue-600 hover:underline mt-4">
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center">
+        <p className="text-slate-600 mb-4">Snippet not found</p>
+        <Link
+          href="/snippets"
+          className="text-slate-900 hover:text-blue-600 transition-colors underline"
+        >
           Back to snippets
         </Link>
       </div>
     );
   }
+
   const handleCopy = async () => {
     await navigator.clipboard.writeText(snippet.content);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // --- Error or not found state ---
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Back Button */}
         <Link
@@ -54,58 +58,44 @@ export default function SnippetDetailPage({ params }: Props) {
           className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors group mb-8"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          <span>Back to snippets</span>
+          <span className="text-sm font-medium">Back to Snippets</span>
         </Link>
 
         {/* Header */}
-        <div className="bg-white rounded-2xl border-2 border-slate-200 p-8 mb-6">
-          <h1 className="text-4xl font-bold text-slate-900 mb-4">
+        <div className="mb-8 space-y-4">
+          <div className="flex items-center gap-3 text-sm text-slate-500">
+            <time dateTime={snippet.createdAt.toISOString()}>
+              {format(snippet.createdAt, "MMM dd, yyyy")}
+            </time>
+            <span aria-hidden="true">•</span>
+            <span className="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">
+              {snippet.language}
+            </span>
+          </div>
+
+          <h1 className="text-4xl md:text-5xl font-light text-slate-900">
             {snippet.title}
           </h1>
 
           {snippet.description && (
-            <p className="text-lg text-slate-600 mb-6 leading-relaxed">
+            <p className="text-lg text-slate-600 font-light leading-relaxed">
               {snippet.description}
             </p>
           )}
-
-          {/* Meta Info */}
-          <div className="flex flex-wrap gap-4 text-sm text-slate-500">
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              <span>
-                {snippet.createdAt.toLocaleDateString("en-US", {
-                  month: "long",
-                  day: "numeric",
-                  year: "numeric",
-                })}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Tag className="w-4 h-4" />
-              {/* <div className="flex gap-2">
-                {snippet.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div> */}
-            </div>
-          </div>
         </div>
 
+        {/* Divider */}
+        <div className="w-16 h-px bg-slate-300 mb-8" />
+
         {/* Code Block */}
-        <div className="bg-slate-900 rounded-2xl border-2 border-slate-800 overflow-hidden">
+        <div className="bg-slate-900 rounded-xl overflow-hidden border border-slate-800">
           {/* Code Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800">
             <div className="flex items-center gap-3">
-              <div className="flex gap-2">
-                <div className="w-3 h-3 rounded-full bg-red-500" />
-                <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                <div className="w-3 h-3 rounded-full bg-green-500" />
+              <div className="flex gap-1.5" aria-hidden="true">
+                <div className="w-3 h-3 rounded-full bg-red-500/80" />
+                <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
+                <div className="w-3 h-3 rounded-full bg-green-500/80" />
               </div>
               <span className="text-sm text-slate-400 font-mono">
                 {snippet.language}
@@ -114,6 +104,9 @@ export default function SnippetDetailPage({ params }: Props) {
             <button
               onClick={handleCopy}
               className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg transition-colors text-sm font-medium"
+              aria-label={
+                copied ? "Copied to clipboard" : "Copy code to clipboard"
+              }
             >
               {copied ? (
                 <>
@@ -130,26 +123,20 @@ export default function SnippetDetailPage({ params }: Props) {
           </div>
 
           {/* Code Content */}
-
-          <pre className="p-6 font-mono text-sm leading-relaxed text-slate-300 overflow-x-auto whitespace-pre-wrap">
+          <pre className="p-6 font-mono text-sm leading-relaxed text-slate-300 overflow-x-auto">
             <code>{snippet.content}</code>
           </pre>
         </div>
 
-        {/* Usage Section (Optional) */}
-        {/* <div className="mt-6 bg-blue-50 border-2 border-blue-200 rounded-2xl p-6">
-          <h3 className="text-lg font-semibold text-slate-900 mb-3">
-            Usage Example
-          </h3>
-          <pre className="bg-white rounded-lg p-4 overflow-x-auto border border-blue-200">
-            <code className="text-sm text-slate-800 font-mono">
-              {`const [searchTerm, setSearchTerm] = useState('');
-const debouncedSearch = useDebounce(searchTerm, 500);
-
-// debouncedSearch only updates 500ms after user stops typing`}
-            </code>
-          </pre>
-        </div> */}
+        {/* Back to All CTA */}
+        <div className="mt-12 text-center">
+          <Link
+            href="/snippets"
+            className="inline-flex items-center gap-2 px-6 py-3 border border-slate-200 text-slate-700 rounded-lg font-medium hover:border-slate-300 hover:bg-slate-50 transition-all duration-200"
+          >
+            View All Snippets
+          </Link>
+        </div>
       </div>
     </div>
   );

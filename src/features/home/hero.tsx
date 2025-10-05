@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Hero() {
   return (
@@ -48,21 +49,25 @@ export default function Hero() {
               </Link>
             </div>
 
-            {/* Quick stats/skills */}
-            <div className="flex flex-wrap gap-8 pt-8 border-t border-slate-100">
+            {/* Quick stats/skills - Improved spacing and semantic markup */}
+            <dl className="grid grid-cols-3 gap-6 pt-10 border-t border-slate-200">
               <div className="text-center sm:text-left">
-                <div className="text-2xl font-semibold text-slate-900">3+</div>
-                <div className="text-sm text-slate-500">Years Experience</div>
+                <dt className="text-3xl font-semibold text-slate-900">3+</dt>
+                <dd className="text-sm text-slate-500 mt-1">
+                  Years Experience
+                </dd>
               </div>
-              <div className="text-center sm:text-left">
-                <div className="text-2xl font-semibold text-slate-900">50+</div>
-                <div className="text-sm text-slate-500">Projects Delivered</div>
+              <div className="text-center sm:text-left border-l border-slate-100 pl-6">
+                <dt className="text-3xl font-semibold text-slate-900">20+</dt>
+                <dd className="text-sm text-slate-500 mt-1">
+                  Projects Delivered
+                </dd>
               </div>
-              <div className="text-center sm:text-left">
-                <div className="text-2xl font-semibold text-slate-900">∞</div>
-                <div className="text-sm text-slate-500">Lines of Code</div>
+              <div className="text-center sm:text-left border-l border-slate-100 pl-6">
+                <dt className="text-3xl font-semibold text-slate-900">∞</dt>
+                <dd className="text-sm text-slate-500 mt-1">Lines of Code</dd>
               </div>
-            </div>
+            </dl>
           </div>
 
           {/* Right visual */}
@@ -70,29 +75,44 @@ export default function Hero() {
             <div className="relative">
               {/* Main image container */}
               <div className="w-80 h-80 rounded-2xl overflow-hidden border-2 border-slate-200 shadow-lg">
-                <img
+                <Image
                   src="/profile.webp"
                   alt="Brian - Fullstack Developer"
+                  width={320}
+                  height={320}
                   className="w-full h-full object-cover"
+                  priority
                 />
               </div>
 
-              {/* Subtle decorative elements that complement the vibrant image */}
-              <div className="absolute -z-10 -top-4 -right-4 w-20 h-20 bg-orange-100 rounded-2xl opacity-40"></div>
-              <div className="absolute -z-10 -bottom-6 -left-6 w-16 h-16 bg-blue-100 rounded-full opacity-30"></div>
+              {/* Subtle decorative elements - Added aria-hidden */}
+              <div
+                className="absolute -z-10 -top-4 -right-4 w-20 h-20 bg-orange-100 rounded-2xl opacity-40"
+                aria-hidden="true"
+              ></div>
+              <div
+                className="absolute -z-10 -bottom-6 -left-6 w-16 h-16 bg-blue-100 rounded-full opacity-30"
+                aria-hidden="true"
+              ></div>
 
               {/* Small accent elements */}
-              <div className="absolute top-4 left-4 w-2 h-2 bg-orange-400 rounded-full opacity-70"></div>
-              <div className="absolute bottom-8 right-6 w-1 h-6 bg-blue-400 opacity-40"></div>
+              <div
+                className="absolute top-4 left-4 w-2 h-2 bg-orange-400 rounded-full opacity-70"
+                aria-hidden="true"
+              ></div>
+              <div
+                className="absolute bottom-8 right-6 w-1 h-6 bg-blue-400 opacity-40"
+                aria-hidden="true"
+              ></div>
             </div>
           </div>
         </div>
 
-        {/* Tech stack indicator */}
-        <div className="mt-20 pt-12 border-t border-gray-200">
+        {/* Tech stack indicator - Core technologies */}
+        <div className="mt-24 pt-12 border-t border-slate-200">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
             <p className="text-sm text-slate-500 font-medium">
-              Technologies I enjoy working with
+              Core Technologies
             </p>
             <div>
               <div className="flex flex-wrap gap-6 text-sm text-slate-400">
@@ -100,7 +120,7 @@ export default function Hero() {
                   React
                 </span>
                 <span className="hover:text-slate-600 transition-colors cursor-default">
-                  Bun
+                  Next.js
                 </span>
                 <span className="hover:text-slate-600 transition-colors cursor-default">
                   TypeScript
@@ -113,12 +133,6 @@ export default function Hero() {
                 </span>
                 <span className="hover:text-slate-600 transition-colors cursor-default">
                   PostgreSQL
-                </span>
-                <span className="hover:text-slate-600 transition-colors cursor-default">
-                  Drizzle
-                </span>
-                <span className="hover:text-slate-600 transition-colors cursor-default">
-                  Hono
                 </span>
               </div>
             </div>

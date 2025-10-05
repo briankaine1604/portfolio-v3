@@ -12,17 +12,10 @@ import {
 import { useTRPC } from "@/trpc/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
+import { Search } from "lucide-react";
 import Link from "next/link";
 import { useQueryState } from "nuqs";
 import { useDebounce } from "use-debounce";
-
-// type BlogListItem = Pick<
-//   SelectBlog,
-//   "id" | "title" | "slug" | "excerpt" | "createdAt"
-// >;
-// type Props = {
-//   posts: BlogListItem[];
-// };
 
 export default function BlogListCard() {
   const [search, setSearch] = useQueryState("search", {
@@ -40,7 +33,7 @@ export default function BlogListCard() {
     parse: String,
     serialize: String,
   });
-  const [debouncedSearch] = useDebounce(search, 300); // Debounce the URL state directly
+  const [debouncedSearch] = useDebounce(search, 300);
   const trpc = useTRPC();
   const limit = 10;
   const { data: postsData } = useQuery(
@@ -56,36 +49,38 @@ export default function BlogListCard() {
 
   const handleSearchChange = (value: string) => {
     setSearch(value);
-    setPage(1); // Reset to first page on new search
+    setPage(1);
   };
 
   const handleCategoryChange = (value: string) => {
     setCategoryId(value);
-    setPage(1); // Reset to first page on new search
+    setPage(1);
   };
 
   const hasMore = postsData && postsData?.length > limit;
   const posts = hasMore ? postsData?.slice(0, limit) : postsData || [];
+
   return (
     <div>
-      <div className="mb-8 grid grid-cols-1 gap-y-3 md:grid-cols-3 gap-x-4 items-center">
-        <Input
-          type="text"
-          value={search}
-          onChange={(e) => handleSearchChange(e.target.value)}
-          placeholder="Search blogs..."
-          className="w-full py-2 border border-gray-300 rounded-lg col-span-2"
-        />
+      {/* Filters */}
+      <div className="mb-12 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="relative md:col-span-2">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Input
+            type="text"
+            value={search}
+            onChange={(e) => handleSearchChange(e.target.value)}
+            placeholder="Search articles..."
+            className="pl-11 h-12 border-slate-200 focus:border-slate-300 rounded-lg"
+          />
+        </div>
 
         <Select value={categoryId} onValueChange={handleCategoryChange}>
-          <SelectTrigger className="w-full items-center">
-            <SelectValue placeholder="Filter by Category ....." />
+          <SelectTrigger className="h-12 border-slate-200 rounded-lg">
+            <SelectValue placeholder="All Categories" />
           </SelectTrigger>
           <SelectContent>
-            {/* Reset option */}
-            <SelectItem value="all">All</SelectItem>
-
-            {/* Real categories */}
+            <SelectItem value="all">All Categories</SelectItem>
             {catData?.map((cat) => (
               <SelectItem key={cat.id} value={cat.id}>
                 {cat.name}
@@ -95,48 +90,77 @@ export default function BlogListCard() {
         </Select>
       </div>
 
-      <div className="space-y-8">
-        {posts &&
-          posts.map((post) => (
+      {/* Blog Posts */}
+      {posts.length === 0 ? (
+        <div className="text-center py-20">
+          <div className="text-slate-400 mb-4" aria-hidden="true">
+            <Search className="w-12 h-12 mx-auto opacity-50" />
+          </div>
+          <p className="text-slate-600">No posts found</p>
+          <p className="text-sm text-slate-500 mt-2">
+            Try adjusting your search or filters
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {posts.map((post) => (
             <article
               key={post.id}
-              className="border-b border-gray-200 pb-6 hover:opacity-90 transition"
+              className="group p-6 bg-white border border-slate-200 rounded-xl hover:border-slate-300 hover:shadow-sm transition-all duration-200"
               onMouseEnter={async () => {
                 queryClient.prefetchQuery(
                   trpc.blog.getOnePublic.queryOptions(post.slug)
                 );
               }}
             >
-              <h2 className="text-2xl font-semibold">
-                <Link
-                  href={`/blog/${post.slug}`}
-                  className="hover:text-blue-600 transition-colors"
-                >
+              <Link href={`/blog/${post.slug}`} className="block space-y-3">
+                <div className="flex items-center gap-3 text-xs text-slate-500">
+                  <time dateTime={post.createdAt.toISOString()}>
+                    {format(post.createdAt, "MMM dd, yyyy")}
+                  </time>
+                </div>
+
+                <h2 className="text-xl font-medium text-slate-900 group-hover:text-blue-600 transition-colors">
                   {post.title}
-                </Link>
-              </h2>
-              <p className="text-sm text-gray-500">
-                {format(post.createdAt, "yyyy-MM-dd")}
-              </p>
-              <p className="mt-2 text-gray-700">{post.excerpt}</p>
+                </h2>
+
+                <p className="text-slate-600 font-light leading-relaxed line-clamp-2">
+                  {post.excerpt}
+                </p>
+
+                <div className="flex items-center gap-2 text-sm text-slate-500 group-hover:text-slate-900 transition-colors">
+                  <span>Read more</span>
+                  <span className="transition-transform group-hover:translate-x-1">
+                    →
+                  </span>
+                </div>
+              </Link>
             </article>
           ))}
-      </div>
+        </div>
+      )}
+
+      {/* Pagination */}
       {posts.length > 0 && (
-        <div className="mt-8 flex justify-between">
+        <div className="mt-12 flex items-center justify-between pt-8 border-t border-slate-200">
           <Button
             variant="outline"
             disabled={page === 1}
             onClick={() => setPage((p) => p - 1)}
+            className="h-11 px-6 border-slate-200 hover:bg-slate-50"
           >
-            Prev
+            ← Previous
           </Button>
+
+          <span className="text-sm text-slate-500">Page {page}</span>
+
           <Button
-            variant={"outline"}
+            variant="outline"
             disabled={!hasMore}
             onClick={() => setPage((p) => p + 1)}
+            className="h-11 px-6 border-slate-200 hover:bg-slate-50"
           >
-            Next
+            Next →
           </Button>
         </div>
       )}
