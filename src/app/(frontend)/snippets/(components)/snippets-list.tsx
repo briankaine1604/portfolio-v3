@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useQueryState } from "nuqs";
 import { useDebounce } from "use-debounce";
-import { Search } from "lucide-react";
+import { Search, Code2 } from "lucide-react";
 
 type Props = {};
 
@@ -20,20 +20,26 @@ export default function SnippetListPublic({}: Props) {
     parse: Number,
     serialize: String,
   });
+
   const trpc = useTRPC();
   const limit = 10;
   const [debouncedSearch] = useDebounce(search, 300);
-  const { data: snippets } = useQuery(
+
+  const { data: snippets, isLoading } = useQuery(
     trpc.snippet.getAllPublic.queryOptions({
       page,
       limit,
       search: debouncedSearch,
     })
   );
+
   const handleSearchChange = (value: string) => {
     setSearch(value);
     setPage(1);
   };
+
+  const hasSearchQuery = search.trim().length > 0;
+  const isEmpty = snippets && snippets.length === 0;
 
   return (
     <section className="min-h-screen px-6 py-20 bg-white">
@@ -71,14 +77,33 @@ export default function SnippetListPublic({}: Props) {
         </div>
 
         {/* Snippets List */}
-        {snippets && snippets.length === 0 ? (
+        {isLoading ? (
+          <div className="space-y-4">
+            {[...Array(5)].map((_, i) => (
+              <div
+                key={i}
+                className="animate-pulse p-6 bg-white border border-slate-200 rounded-xl"
+              >
+                <div className="h-5 bg-slate-200 rounded w-3/4"></div>
+              </div>
+            ))}
+          </div>
+        ) : isEmpty ? (
           <div className="text-center py-20">
             <div className="text-slate-400 mb-4" aria-hidden="true">
-              <Search className="w-12 h-12 mx-auto opacity-50" />
+              {hasSearchQuery ? (
+                <Search className="w-12 h-12 mx-auto opacity-50" />
+              ) : (
+                <Code2 className="w-12 h-12 mx-auto opacity-50" />
+              )}
             </div>
-            <p className="text-slate-600">No snippets found</p>
-            <p className="text-sm text-slate-500 mt-2">
-              Try adjusting your search
+            <p className="text-slate-600 text-lg mb-2">
+              {hasSearchQuery ? "No snippets found" : "No snippets yet"}
+            </p>
+            <p className="text-sm text-slate-500">
+              {hasSearchQuery
+                ? "Try adjusting your search"
+                : "Check back soon for code snippets"}
             </p>
           </div>
         ) : (
