@@ -2,6 +2,7 @@ import { prefetch, trpc } from "@/trpc/server";
 import Link from "next/link";
 import { Suspense } from "react";
 import { BlogList } from "./(components)/blog-list";
+import { CategoryList } from "./(components)/category-list";
 
 export default function BlogAdmin() {
   const page = 1; // default page
@@ -29,6 +30,9 @@ export default function BlogAdmin() {
           <BlogList />
         </Suspense>
       </section>
+      <article>
+        <CategoryList />
+      </article>
     </div>
   );
 }

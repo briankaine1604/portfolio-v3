@@ -1,8 +1,7 @@
 "use client";
-import type { Project } from "@/types";
-import { ProjectCard } from "./project-card";
-import { useQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/client";
+import { useQuery } from "@tanstack/react-query";
+import { ProjectCard } from "./project-card";
 
 export default function Projects() {
   const trpc = useTRPC();

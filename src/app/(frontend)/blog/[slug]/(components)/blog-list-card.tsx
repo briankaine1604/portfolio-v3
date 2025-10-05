@@ -2,13 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { SelectBlog } from "@/db/schema/blogs";
-import { useTRPC } from "@/trpc/client";
-import { useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
-import Link from "next/link";
-import { useQueryState } from "nuqs";
-import { useDebounce } from "use-debounce";
 import {
   Select,
   SelectContent,
@@ -16,6 +9,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTRPC } from "@/trpc/client";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { format } from "date-fns";
+import Link from "next/link";
+import { useQueryState } from "nuqs";
+import { useDebounce } from "use-debounce";
 
 // type BlogListItem = Pick<
 //   SelectBlog,
@@ -53,6 +52,7 @@ export default function BlogListCard() {
     })
   );
   const { data: catData } = useQuery(trpc.category.getAll.queryOptions());
+  const queryClient = useQueryClient();
 
   const handleSearchChange = (value: string) => {
     setSearch(value);
@@ -68,7 +68,7 @@ export default function BlogListCard() {
   const posts = hasMore ? postsData?.slice(0, limit) : postsData || [];
   return (
     <div>
-      <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-x-4">
+      <div className="mb-8 grid grid-cols-1 gap-y-3 md:grid-cols-3 gap-x-4 items-center">
         <Input
           type="text"
           value={search}
@@ -76,31 +76,36 @@ export default function BlogListCard() {
           placeholder="Search blogs..."
           className="w-full py-2 border border-gray-300 rounded-lg col-span-2"
         />
-        <div>
-          <Select value={categoryId} onValueChange={handleCategoryChange}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Filter by Category ....." />
-            </SelectTrigger>
-            <SelectContent>
-              {/* Reset option */}
-              <SelectItem value="all">All</SelectItem>
 
-              {/* Real categories */}
-              {catData?.map((cat) => (
-                <SelectItem key={cat.id} value={cat.id}>
-                  {cat.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <Select value={categoryId} onValueChange={handleCategoryChange}>
+          <SelectTrigger className="w-full items-center">
+            <SelectValue placeholder="Filter by Category ....." />
+          </SelectTrigger>
+          <SelectContent>
+            {/* Reset option */}
+            <SelectItem value="all">All</SelectItem>
+
+            {/* Real categories */}
+            {catData?.map((cat) => (
+              <SelectItem key={cat.id} value={cat.id}>
+                {cat.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
+
       <div className="space-y-8">
         {posts &&
           posts.map((post) => (
             <article
               key={post.id}
               className="border-b border-gray-200 pb-6 hover:opacity-90 transition"
+              onMouseEnter={async () => {
+                queryClient.prefetchQuery(
+                  trpc.blog.getOnePublic.queryOptions(post.slug)
+                );
+              }}
             >
               <h2 className="text-2xl font-semibold">
                 <Link

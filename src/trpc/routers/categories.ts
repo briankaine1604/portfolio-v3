@@ -3,6 +3,7 @@ import { GenerateUniqueSlug } from "@/utils/slugify";
 import { eq } from "drizzle-orm";
 import z from "zod";
 import { baseProcedure, createTRPCRouter } from "../init";
+import { blogs } from "@/db/schema/blogs";
 
 export const categoriesRouter = createTRPCRouter({
   getAll: baseProcedure.query(({ ctx }) => {
@@ -41,4 +42,33 @@ export const categoriesRouter = createTRPCRouter({
         .returning();
       return result[0];
     }),
+  delete: baseProcedure.input(z.string()).mutation(async ({ ctx, input }) => {
+    const category = await ctx.db
+      .select({ id: categories.id })
+      .from(categories)
+      .where(eq(categories.slug, input))
+      .limit(1);
+
+    if (!category[0]) {
+      throw new Error("Category not found");
+    }
+
+    const categoryId = category[0].id;
+
+    // Step 2: Check if any blogs are linked to this category
+    const isCategoryLinked = await ctx.db
+      .select()
+      .from(blogs)
+      .where(eq(blogs.categoryId, categoryId))
+      .limit(1);
+
+    if (isCategoryLinked.length > 0) {
+      throw new Error("Cannot delete category linked to blogs");
+    }
+    const result = await ctx.db
+      .delete(categories)
+      .where(eq(categories.slug, input))
+      .returning();
+    return result[0];
+  }),
 });

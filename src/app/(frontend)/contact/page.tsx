@@ -1,4 +1,7 @@
 "use client";
+import { useTRPC } from "@/trpc/client";
+import { useMutation } from "@tanstack/react-query";
+import Image from "next/image";
 import { useState } from "react";
 
 export default function Contact() {
@@ -7,7 +10,10 @@ export default function Contact() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const trpc = useTRPC();
+  const mutation = useMutation(trpc.contact.create.mutationOptions());
+
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     // form values available here
@@ -16,6 +22,13 @@ export default function Contact() {
       email,
       message,
     });
+    mutation.mutate(
+      { name, email, message },
+      {
+        onSuccess: () => console.log("success"),
+        onError: (err) => console.log(err),
+      }
+    );
 
     // reset if needed
     setName("");
@@ -81,23 +94,26 @@ export default function Contact() {
             </div>
             <button
               type="submit"
-              className="w-full px-6 py-3 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition-colors"
+              className="w-full px-6 py-3 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 focus:ring-2 focus:ring-slate-400/50 shadow transition duration-150"
             >
               Send Message
             </button>
           </form>
 
           {/* Alternative contact */}
-          <div className="flex flex-col justify-center space-y-8">
-            <div>
-              <h3 className="text-lg font-medium text-slate-900">Email</h3>
-              <a
-                href="mailto:briankaine1604@gmail.com"
-                className="text-slate-600 hover:text-slate-900 transition-colors"
-              >
-                briankaine1604@gmail.com
-              </a>
-            </div>
+          <div className="flex flex-col justify-center space-y-8 col-span-2">
+            <a
+              href="mailto:contact@briankaine.com"
+              className="flex gap-x-2 items-center"
+            >
+              <div className="flex size-8 gap-6 text-slate-600">
+                <img src="/mail.svg" alt="GitHub" />
+              </div>
+
+              <span className="text-slate-600 hover:text-slate-900 transition-colors">
+                contact@briankaine.com
+              </span>
+            </a>
 
             <div>
               <h3 className="text-lg font-medium text-slate-900">Socials</h3>
@@ -108,7 +124,9 @@ export default function Contact() {
                   rel="noopener noreferrer"
                   className="hover:text-slate-900 transition-colors"
                 >
-                  GitHub
+                  <div className="flex size-8 gap-6 mt-3 text-slate-600">
+                    <img src="/github.svg" alt="GitHub" />
+                  </div>
                 </a>
                 <a
                   href="https://www.linkedin.com/in/brian-ikeogu-876023199/"
@@ -116,7 +134,9 @@ export default function Contact() {
                   rel="noopener noreferrer"
                   className="hover:text-slate-900 transition-colors"
                 >
-                  LinkedIn
+                  <div className="flex size-8 gap-6 mt-3 text-slate-600">
+                    <img src="/linkedIn.svg" alt="GitHub" />
+                  </div>
                 </a>
                 <a
                   href="https://twitter.com/"
@@ -124,7 +144,9 @@ export default function Contact() {
                   rel="noopener noreferrer"
                   className="hover:text-slate-900 transition-colors"
                 >
-                  Twitter
+                  <div className="flex size-8 gap-6 mt-3 text-slate-600">
+                    <img src="/twitter.svg" alt="GitHub" />
+                  </div>
                 </a>
               </div>
             </div>

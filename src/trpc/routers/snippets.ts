@@ -68,13 +68,18 @@ export const snippetRouter = createTRPCRouter({
         page: z.number().min(1).default(1),
         limit: z.number().min(1).max(50).default(10),
         search: z.string().optional(),
+        language: z.string().optional(),
       })
     )
     .query(({ ctx, input }) => {
-      const { page, limit, search } = input;
+      const { page, limit, search, language } = input;
       let conditions = [];
       if (search) {
         conditions.push(ilike(snippets.title, `%${input.search}%`));
+      }
+
+      if (language) {
+        conditions.push(eq(snippets.language, language));
       }
 
       const where = conditions.length > 0 ? and(...conditions) : undefined;

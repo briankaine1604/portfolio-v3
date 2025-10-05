@@ -18,7 +18,7 @@ async function page({ params }: Props) {
   const slug = (await params).slug;
   prefetch(trpc.snippet.getOne.queryOptions(slug));
   return (
-    <div>
+    <div className="p-8">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -26,7 +26,7 @@ async function page({ params }: Props) {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/projects">Snippets</BreadcrumbLink>
+            <BreadcrumbLink href="/admin/snippet">Snippets</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>

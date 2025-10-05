@@ -1,6 +1,7 @@
 import { prefetch, trpc } from "@/trpc/server";
 import Link from "next/link";
 import BlogListCard from "./[slug]/(components)/blog-list-card";
+import { Suspense } from "react";
 
 export default function BlogPage() {
   prefetch(trpc.blog.getAllPublic.queryOptions({ page: 1, limit: 10 }));
@@ -16,7 +17,13 @@ export default function BlogPage() {
       </div>
 
       {/* Blog posts */}
-      <BlogListCard />
+      <Suspense
+        fallback={
+          <p className="text-center text-slate-500">Loading blogs...</p>
+        }
+      >
+        <BlogListCard />
+      </Suspense>
     </section>
   );
 }

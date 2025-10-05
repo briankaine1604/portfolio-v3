@@ -9,10 +9,12 @@ export async function GenerateUniqueSlug(title: string, db: any) {
 
   let count = 1;
 
+  const baseSlug = slug;
+
   while (
     (await db.select().from(projects).where(eq(projects.slug, slug))).length > 0
   ) {
-    slug = `${slug}-${count++}`;
+    slug = `${baseSlug}-${count++}`;
   }
 
   return slug;
