@@ -1,1 +1,0 @@
-ALTER TABLE "snippets" ALTER COLUMN "language" SET DEFAULT 'typescript';

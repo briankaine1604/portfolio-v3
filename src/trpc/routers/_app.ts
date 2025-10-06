@@ -18,3 +18,5 @@ export type AppRouter = typeof appRouter;
 
 type RouterOutputs = inferRouterOutputs<AppRouter>;
 export type BlogWithNav = RouterOutputs["blog"]["getOnePublic"];
+
+export type SnippetListTypes = RouterOutputs["snippet"]["getAllPublic"];

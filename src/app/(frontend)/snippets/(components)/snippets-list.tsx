@@ -33,13 +33,13 @@ export default function SnippetListPublic({}: Props) {
     })
   );
 
+  const hasSearchQuery = search.trim().length > 0;
+  const isEmpty = !snippets || snippets.length === 0;
+
   const handleSearchChange = (value: string) => {
     setSearch(value);
     setPage(1);
   };
-
-  const hasSearchQuery = search.trim().length > 0;
-  const isEmpty = snippets && snippets.length === 0;
 
   return (
     <section className="min-h-screen px-6 py-20 bg-white">
@@ -77,18 +77,7 @@ export default function SnippetListPublic({}: Props) {
         </div>
 
         {/* Snippets List */}
-        {isLoading ? (
-          <div className="space-y-4">
-            {[...Array(5)].map((_, i) => (
-              <div
-                key={i}
-                className="animate-pulse p-6 bg-white border border-slate-200 rounded-xl"
-              >
-                <div className="h-5 bg-slate-200 rounded w-3/4"></div>
-              </div>
-            ))}
-          </div>
-        ) : isEmpty ? (
+        {isEmpty ? (
           <div className="text-center py-20">
             <div className="text-slate-400 mb-4" aria-hidden="true">
               {hasSearchQuery ? (
