@@ -96,48 +96,61 @@ export function EditProjectForm({ slug }: Props) {
           className="space-y-8"
         >
           {/* Title Field */}
-          <div className="flex gap-x-5">
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-semibold text-gray-700">
-                    Project Title
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Enter your project title"
-                      {...field}
-                      className="mt-2 block w-full rounded-xl border-0 bg-gray-50 px-4 py-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-500 focus:bg-white transition-all duration-200"
-                    />
-                  </FormControl>
-                  <FormMessage className="mt-2 text-sm text-red-500" />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="priority"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-semibold text-gray-700">
-                    Priority
-                  </FormLabel>
+          <div className="flex gap-x-5 w-full">
+            {/* Title Field */}
+            <div className="flex-1">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-semibold text-gray-700">
+                      Project Title
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter your project title"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className="mt-2 text-sm text-red-500" />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-                  <FormControl>
-                    <Input
-                      placeholder="Enter your project title"
-                      {...field}
-                      value={field.value ?? 0}
-                      type="number"
-                      className="mt-2 block w-full rounded-xl border-0 bg-gray-50 px-4 py-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-500 focus:bg-white transition-all duration-200"
-                    />
-                  </FormControl>
-                  <FormMessage className="mt-2 text-sm text-red-500" />
-                </FormItem>
-              )}
-            />
+            <div className="flex-1">
+              <FormField
+                control={form.control}
+                name="priority"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-semibold text-gray-700">
+                      Priority
+                    </FormLabel>
+
+                    <FormControl>
+                      <Input
+                        placeholder="Enter priority (0-100)"
+                        type="number"
+                        value={field.value === 0 ? "" : field.value ?? ""}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          field.onChange(val === "" ? 0 : Number(val));
+                        }}
+                        onBlur={(e) => {
+                          if (e.target.value === "") {
+                            field.onChange(0);
+                          }
+                          field.onBlur();
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage className="mt-2 text-sm text-red-500" />
+                  </FormItem>
+                )}
+              />
+            </div>
           </div>
           {/* Description Field */}
           <FormField

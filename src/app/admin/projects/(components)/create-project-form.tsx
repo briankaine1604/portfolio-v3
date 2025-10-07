@@ -16,10 +16,12 @@ import { insertProjectSchema } from "@/db/schema/projects";
 import { useTRPC } from "@/trpc/client";
 import { UploadButton } from "@/utils/uploadthing";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Github, Link2, Loader2, Plus, UploadCloud, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 const createProjectSchema = insertProjectSchema.omit({ slug: true });
@@ -27,6 +29,9 @@ const createProjectSchema = insertProjectSchema.omit({ slug: true });
 export function CreateProjectForm() {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const maxTags = 12;
+
+  const router = useRouter();
+  const queryClient = useQueryClient();
 
   const trpc = useTRPC();
   const mutation = useMutation(trpc.project.create.mutationOptions());
@@ -45,7 +50,18 @@ export function CreateProjectForm() {
   });
 
   function onSubmit(values: z.infer<typeof createProjectSchema>) {
-    mutation.mutate(values);
+    mutation.mutate(values, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.project.getAll.queryKey(),
+        });
+        toast.success("Project created!");
+        router.push("/admin/projects");
+      },
+      onError: (error) => {
+        toast.error(`Error: ${error.message}`);
+      },
+    });
     console.log(values);
   }
 
@@ -58,50 +74,61 @@ export function CreateProjectForm() {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <div className="flex gap-x-5">
+          <div className="flex gap-x-5 w-full">
             {/* Title Field */}
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-semibold text-gray-700">
-                    Project Title
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Enter your project title"
-                      {...field}
-                      className="mt-2 block w-full rounded-xl border-0 bg-gray-50 px-4 py-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-500 focus:bg-white transition-all duration-200"
-                    />
-                  </FormControl>
-                  <FormMessage className="mt-2 text-sm text-red-500" />
-                </FormItem>
-              )}
-            />
+            <div className="flex-1">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-semibold text-gray-700">
+                      Project Title
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter your project title"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className="mt-2 text-sm text-red-500" />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-            <FormField
-              control={form.control}
-              name="priority"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-semibold text-gray-700">
-                    Priority
-                  </FormLabel>
+            <div className="flex-1">
+              <FormField
+                control={form.control}
+                name="priority"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-semibold text-gray-700">
+                      Priority
+                    </FormLabel>
 
-                  <FormControl>
-                    <Input
-                      placeholder="Enter your project title"
-                      {...field}
-                      value={field.value ?? 0}
-                      type="number"
-                      className="mt-2 block w-full rounded-xl border-0 bg-gray-50 px-4 py-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-500 focus:bg-white transition-all duration-200"
-                    />
-                  </FormControl>
-                  <FormMessage className="mt-2 text-sm text-red-500" />
-                </FormItem>
-              )}
-            />
+                    <FormControl>
+                      <Input
+                        placeholder="Enter priority (0-100)"
+                        type="number"
+                        value={field.value === 0 ? "" : field.value ?? ""}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          field.onChange(val === "" ? 0 : Number(val));
+                        }}
+                        onBlur={(e) => {
+                          if (e.target.value === "") {
+                            field.onChange(0);
+                          }
+                          field.onBlur();
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage className="mt-2 text-sm text-red-500" />
+                  </FormItem>
+                )}
+              />
+            </div>
           </div>
           {/* Description Field */}
           <FormField
