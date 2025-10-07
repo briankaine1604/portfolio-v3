@@ -15,15 +15,15 @@ export function ProjectCard({ project }: { project: InsertProject }) {
       : project.description;
 
   return (
-    <div className="group relative rounded-2xl overflow-hidden border border-slate-200/60 bg-white shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-slate-300/60 transition-all duration-300">
+    <div className="group relative rounded-2xl overflow-hidden border border-slate-200/60 bg-white shadow-sm hover:border-slate-300/60 transition-all duration-300">
       {/* Image with overlay gradient on hover */}
       <div className="relative aspect-video bg-slate-100 overflow-hidden">
         <img
           src={project.image}
           alt={project.title}
-          className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
+          className="w-full h-full object-cover transition-transform duration-500"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0" />
       </div>
 
       {/* Content with subtle gradient background on hover */}
