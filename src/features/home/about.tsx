@@ -67,7 +67,7 @@ export default function About() {
 
           {/* Side Stats */}
           <div className="lg:col-span-4">
-            <dl className="grid grid-cols-3 lg:grid-cols-1 gap-4">
+            <dl className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 gap-4">
               <div className="text-center lg:text-left p-6 bg-white rounded-xl border border-slate-200 shadow-sm">
                 <dt className="text-3xl font-semibold text-slate-900">20+</dt>
                 <dd className="text-sm text-slate-500 mt-1">Projects</dd>

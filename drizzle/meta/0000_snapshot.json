@@ -1,5 +1,5 @@
 {
-  "id": "2ee985ad-3d26-497d-a9a6-dba11f44715c",
+  "id": "08ae9b76-a992-478f-9f0c-9e84de6c1934",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -309,6 +309,19 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "language": {
+          "name": "language",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'typescript'"
         },
         "created_at": {
           "name": "created_at",

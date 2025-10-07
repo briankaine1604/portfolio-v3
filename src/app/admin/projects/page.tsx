@@ -1,4 +1,4 @@
-import { prefetch, trpc } from "@/trpc/server";
+import { HydrateClient, prefetch, trpc } from "@/trpc/server";
 import { Suspense } from "react";
 import { ProjectList } from "./(components)/project-list";
 import Link from "next/link";
@@ -24,11 +24,13 @@ export default function ProjectsAdmin() {
 
       {/* Content */}
       <section>
-        <Suspense
-          fallback={<div className="text-gray-500">Loading projects...</div>}
-        >
-          <ProjectList />
-        </Suspense>
+        <HydrateClient>
+          <Suspense
+            fallback={<div className="text-gray-500">Loading projects...</div>}
+          >
+            <ProjectList />
+          </Suspense>
+        </HydrateClient>
       </section>
     </div>
   );

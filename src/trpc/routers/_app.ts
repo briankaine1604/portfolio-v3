@@ -20,3 +20,6 @@ type RouterOutputs = inferRouterOutputs<AppRouter>;
 export type BlogWithNav = RouterOutputs["blog"]["getOnePublic"];
 
 export type SnippetListTypes = RouterOutputs["snippet"]["getAllPublic"];
+export type SnippetOneTypes = RouterOutputs["snippet"]["getOne"];
+
+export type ProjectListTypes = RouterOutputs["project"]["getAllPublicHome"];

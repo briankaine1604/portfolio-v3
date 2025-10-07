@@ -17,7 +17,6 @@ function ProjectCardSkeleton() {
 
 export default function ProjectsHome() {
   prefetch(trpc.project.getAllPublicHome.queryOptions());
-
   return (
     <Suspense fallback={<ProjectCardSkeleton />}>
       <ProjectsList />
