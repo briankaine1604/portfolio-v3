@@ -3,6 +3,8 @@ import { Suspense } from "react";
 import { ProjectList } from "./(components)/project-list";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 export default function ProjectsAdmin() {
   const page = 1; // default page
   const limit = 10;
